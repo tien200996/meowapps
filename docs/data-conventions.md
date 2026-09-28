@@ -1,26 +1,40 @@
-# Data best practices
+---
+name: data-conventions
+description: Choose where to store Firestore data
+---
 
-A Firestore layout that works well for meowapps apps.
+# Data conventions
 
-## Layout
+Rules for storing app data in Firestore. Read before adding a collection or field.
 
-```
-shops/{shopId}/integrations/{name}               settings, read by the shop's admin
-shops/{shopId}/integrations/{name}/{kind}/{id}   drafts, logs
-private/{shopId}/integrations/{name}             tokens, server only
-private/{shopId}/wallet                          balance, server only
-system/{name}/{kind}/{id}                        queues, server only
-system/{name}/temp/{id}                          short-lived docs, deleted after expireAt
-```
+## TL;DR
 
-The default rules let a signed-in shop read and write `shops/{shopId}/**`, and deny everything else.
+- Put shop data the admin reads or edits under `shops/{shopId}/integrations/{name}`.
+- Put OAuth tokens and anything the shop mustn't read under `private/{shopId}/integrations/{name}`.
+- Put server-only data under `system/{name}/{kind}`.
+- Use the full shop domain as `shopId`: `myshop.myshopify.com`.
 
-## Gotchas
+## Where data lives
 
-**Do** keep money, tokens and anything the shop mustn't edit under `private/`. **Why:** the client can write anything under `shops/{shopId}`.
+| Data | Path | Client |
+| --- | --- | --- |
+| Settings | `shops/{shopId}/integrations/{name}` | read, write |
+| Drafts, logs | `shops/{shopId}/integrations/{name}/{kind}/{id}` | read, write |
+| OAuth tokens | `private/{shopId}/integrations/{name}` | none |
+| Queues | `system/{name}/{kind}/{id}` | none |
+| Short-lived docs | `system/{name}/temp/{id}` | none |
 
-**Do** set `expireAt` on `temp` docs and check it on read. **Why:** TTL deletes them, up to a day late.
+## Fields
 
-**Don't** name any other collection `temp`. **Why:** TTL matches the collection name anywhere in the database.
+- `at`: ms since epoch (`Date.now()`). Sort by it.
+- `expireAt`: `Date`. Required on `temp` docs. Check it on read, because TTL deletes up to a day late.
 
-**Do** queue cross-shop work under `system/{name}`. **Don't** use collection group queries. **Why:** they need indexes the app can't declare.
+## Don't
+
+**Don't** store tokens under `shops/{shopId}/…`. **Do** use `private/{shopId}/integrations/{name}`. **Why:** the client can write anything under `shops/{shopId}`.
+
+**Don't** call `db.collectionGroup("logs")`. **Do** queue work in `system/{name}/queue/{id}`. **Why:** collection group queries need indexes the app can't declare.
+
+**Don't** use `shops/myshop/…`. **Do** use `shops/myshop.myshopify.com/…`.
+
+**Don't** name a collection `temp` outside `system/{name}`. **Do** use `system/{name}/temp/{id}`. **Why:** TTL deletes by collection name, anywhere in the database.
