@@ -4,23 +4,46 @@ import { mkdirSync, readdirSync, copyFileSync, writeFileSync, readFileSync, exis
 import { basename, relative } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const MEOWAPPS_DIR = ".meowapps";
+const DIR = ".meowapps";
 const TEMPLATES = new URL("../templates/", import.meta.url);
 const DOCS = new URL("../docs/", import.meta.url);
-const { devDependencies } = JSON.parse(
-  readFileSync(new URL("../package.json", import.meta.url)),
-);
-const TOOLS = Object.fromEntries(
-  Object.entries({ shopify: "@shopify/cli", firebase: "firebase-tools" }).map(
-    ([cmd, name]) => [cmd, `${name}@${devDependencies[name]}`],
-  ),
-);
-const DOC_LIST = readdirSync(DOCS).map((file) => ({
-  path: relative(process.cwd(), fileURLToPath(new URL(file, DOCS))),
-  description: readFileSync(new URL(file, DOCS), "utf8").match(/^description: (.*)$/m)[1],
-}));
+const { devDependencies } = JSON.parse(readFileSync(new URL("../package.json", import.meta.url)));
+const pkg = (name) => `${name}@${devDependencies[name]}`;
+const TOOLS = { shopify: pkg("@shopify/cli"), firebase: pkg("firebase-tools") };
+const inDir = basename(process.cwd()) === DIR;
+const at = (file) => `${DIR}/${file}`;
 
-const HELP = `meowapps <command|tool> [args...]
+process.exit(await main(process.argv.slice(2)));
+
+async function main([tool, ...args]) {
+  if (!tool || tool === "--help" || tool === "-h") {
+    console.log(help());
+    return 0;
+  }
+  if (tool !== "init" && !Object.hasOwn(TOOLS, tool)) {
+    console.error(`meowapps: unknown tool '${tool}'\n\n${help()}`);
+    return 1;
+  }
+  process.on("SIGINT", () => {});
+  process.on("SIGTERM", () => {});
+  if (!inDir) prepareDir();
+  if (tool === "init") {
+    const code = await run("shopify", ["app", "config", "link"]);
+    if (code === 0) copyDir(TEMPLATES, ".");
+    return code;
+  }
+  const code = await run(tool, args);
+  if (tool === "firebase" && !inDir && existsSync(at(".firebaserc"))) copyFileSync(at(".firebaserc"), ".firebaserc");
+  return code;
+}
+
+function help() {
+  const docs = readdirSync(DOCS).map((file) => {
+    const url = new URL(file, DOCS);
+    const description = readFileSync(url, "utf8").match(/^description: (.*)$/m)[1];
+    return `  ${relative(process.cwd(), fileURLToPath(url))}\n    ${description}`;
+  });
+  return `meowapps <command|tool> [args...]
 
 Commands:
   init        Set up this project
@@ -37,70 +60,26 @@ Examples:
   meowapps shopify --help
 
 Docs:
-${DOC_LIST.map(({ path, description }) => `  ${path}\n    ${description}`).join("\n")}
+${docs.join("\n")}
 `;
-
-const [tool, ...rest] = process.argv.slice(2);
-
-if (!tool || tool === "--help" || tool === "-h") {
-  console.log(HELP);
-  process.exit(0);
 }
 
-if (tool !== "init" && !(tool in TOOLS)) {
-  console.error(`meowapps: unknown tool '${tool}'\n\n${HELP}`);
-  process.exit(1);
-}
-
-process.on("SIGINT", () => {});
-process.on("SIGTERM", () => {});
-
-const inDir = basename(process.cwd()) === MEOWAPPS_DIR;
-
-if (!inDir) prepareMeowappsDir();
-
-if (tool === "init") {
-  const code = await run("shopify", ["app", "config", "link"]);
-  if (code === 0) copyDir(TEMPLATES, ".");
-  process.exit(code);
-}
-
-const code = await run(tool, rest);
-if (tool === "firebase" && !inDir) keepFirebaserc();
-process.exit(code);
-
-function prepareMeowappsDir() {
-  copyDir(new URL(`${MEOWAPPS_DIR}/`, TEMPLATES), MEOWAPPS_DIR);
-  mkdirSync(`${MEOWAPPS_DIR}/emulator-data`, { recursive: true });
-  writeFileSync(
-    `${MEOWAPPS_DIR}/.gitignore`,
-    `# Ignore the entire ${MEOWAPPS_DIR} directory\n*\n`,
-  );
-  writeFileSync(
-    `${MEOWAPPS_DIR}/firebase.json`,
-    readFileSync(`${MEOWAPPS_DIR}/firebase.json`, "utf8").replaceAll(
-      '"../',
-      JSON.stringify(`${process.cwd()}/`).slice(0, -1),
-    ),
-  );
-  if (existsSync(".firebaserc")) copyFileSync(".firebaserc", `${MEOWAPPS_DIR}/.firebaserc`);
-  else rmSync(`${MEOWAPPS_DIR}/.firebaserc`, { force: true });
+function prepareDir() {
+  copyDir(new URL(`${DIR}/`, TEMPLATES), DIR);
+  mkdirSync(at("emulator-data"), { recursive: true });
+  writeFileSync(at(".gitignore"), `# Ignore the entire ${DIR} directory\n*\n`);
+  const cwd = JSON.stringify(`${process.cwd()}/`).slice(0, -1);
+  writeFileSync(at("firebase.json"), readFileSync(at("firebase.json"), "utf8").replaceAll('"../', cwd));
+  if (existsSync(".firebaserc")) copyFileSync(".firebaserc", at(".firebaserc"));
+  else rmSync(at(".firebaserc"), { force: true });
 }
 
 function run(cmd, args) {
   return new Promise((done) => {
-    const child = spawn("npx", ["--yes", "--package", TOOLS[cmd], cmd, ...args], {
-      stdio: "inherit",
-      cwd: cmd === "firebase" && !inDir ? MEOWAPPS_DIR : ".",
-    });
-    child.on("close", (code) => done(code ?? 1));
+    const cwd = cmd === "firebase" && !inDir ? DIR : ".";
+    spawn("npx", ["--yes", "--package", TOOLS[cmd], cmd, ...args], { stdio: "inherit", cwd })
+      .on("close", (code) => done(code ?? 1));
   });
-}
-
-function keepFirebaserc() {
-  if (existsSync(`${MEOWAPPS_DIR}/.firebaserc`)) {
-    copyFileSync(`${MEOWAPPS_DIR}/.firebaserc`, ".firebaserc");
-  }
 }
 
 function copyDir(src, dest) {
