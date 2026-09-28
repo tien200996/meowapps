@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta name="shopify-api-key" content="__SHOPIFY_API_KEY__" />
+    <script src="https://cdn.shopify.com/shopifycloud/polaris-1.js"></script>
+    <script src="https://cdn.shopify.com/shopifycloud/app-bridge.js"></script>
+
+    <title>App</title>
+  </head>
+
+  <body>
+    <s-app-nav>
+      <s-link href="/">Start</s-link>
+      <s-link href="/learn">Learn</s-link>
+    </s-app-nav>
+
+    <meow-router>
+      <meow-route path="/" tag="meow-index"></meow-route>
+      <meow-route path="/learn" tag="meow-learn"></meow-route>
+      <meow-route path="/learn/:topic" tag="meow-topic"></meow-route>
+    </meow-router>
+
+    <script type="module" src="/components/meow-router.js"></script>
+    <script type="module" src="/components/meow-index.js"></script>
+    <script type="module" src="/components/meow-learn.js"></script>
+    <script type="module" src="/components/meow-topic.js"></script>
+  </body>
+</html>

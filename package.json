@@ -1,0 +1,25 @@
+{
+  "name": "meowapps",
+  "version": "0.1.0",
+  "type": "module",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tien200996/meowapps.git"
+  },
+  "bin": {
+    "meowapps": "bin/meowapps.js"
+  },
+  "exports": {
+    "./functions": "./functions/index.js"
+  },
+  "dependencies": {
+    "@shopify/shopify-api": "^14.0.1",
+    "firebase-admin": "^14.4.0",
+    "firebase-functions": "^7.3.2"
+  },
+  "devDependencies": {
+    "@shopify/cli": "^4.8.0",
+    "firebase-tools": "^15.30.0"
+  }
+}
