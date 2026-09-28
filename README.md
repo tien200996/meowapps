@@ -30,3 +30,5 @@ npx meowapps init
 ## Gotchas
 
 **Do** bump `version` to release. **Don't** run `npm publish` locally. **Why:** CI publishes on push to `main` only when the version is new.
+
+**Do** bump `meowapps` in `templates/functions/package.json` with `version`. **Why:** new apps install the version the template names.
