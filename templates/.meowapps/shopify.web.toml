@@ -1,0 +1,5 @@
+roles = ["frontend"]
+port = 4640
+
+[commands]
+dev = "meowapps firebase emulators:start --project demo-test --import emulator-data --export-on-exit"

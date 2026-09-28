@@ -1,0 +1,11 @@
+{
+  "name": "functions",
+  "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": "22"
+  },
+  "dependencies": {
+    "meowapps": "^0.1.0"
+  }
+}

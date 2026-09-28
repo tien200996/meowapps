@@ -1,0 +1,41 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "functions": {
+    "source": "../functions"
+  },
+  "hosting": {
+    "public": "../public",
+    "rewrites": [
+      { "source": "/api/**", "function": "api" },
+      { "source": "/identitytoolkit.googleapis.com/**", "function": "emulator" },
+      { "source": "/securetoken.googleapis.com/**", "function": "emulator" },
+      { "source": "/google.firestore.v1.Firestore/**", "function": "emulator" },
+      { "source": "/emulator/**", "function": "emulator" },
+      { "source": "**", "destination": "/index.html" }
+    ]
+  },
+  "emulators": {
+    "ui": {
+      "enabled": true,
+      "port": 4600
+    },
+    "hub": {
+      "port": 4601
+    },
+    "auth": {
+      "port": 4610
+    },
+    "firestore": {
+      "port": 4620
+    },
+    "functions": {
+      "port": 4630
+    },
+    "hosting": {
+      "port": 4640
+    },
+    "singleProjectMode": true
+  }
+}
