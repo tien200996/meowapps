@@ -46,7 +46,9 @@ if (tool !== "init" && !(tool in TOOLS)) {
 process.on("SIGINT", () => {});
 process.on("SIGTERM", () => {});
 
-if (basename(process.cwd()) !== MEOWAPPS_DIR) {
+const inDir = basename(process.cwd()) === MEOWAPPS_DIR;
+
+if (!inDir) {
   copyDir(new URL(`${MEOWAPPS_DIR}/`, TEMPLATES), MEOWAPPS_DIR);
   mkdirSync(`${MEOWAPPS_DIR}/emulator-data`, { recursive: true });
   writeFileSync(
@@ -67,6 +69,7 @@ function run(cmd, args) {
   return new Promise((done) => {
     const child = spawn("npx", ["--yes", "--package", TOOLS[cmd], cmd, ...args], {
       stdio: "inherit",
+      cwd: cmd === "firebase" && !inDir ? MEOWAPPS_DIR : ".",
     });
     child.on("close", (code) => done(code ?? 1));
   });
