@@ -5,15 +5,16 @@ Push to `main` deploys Firebase (hosting, functions, rules) and Shopify (app con
 ## One-time setup
 
 1. **Firebase** — Blaze plan, Firestore database, Authentication, a Web app
-2. **Service account** — Editor, Secret Manager Admin, Cloud Functions Admin, then a JSON key
-3. **Shopify** — `application_url` and `redirect_urls` in `shopify.app.toml` point to `https://<project>.web.app`
-4. **App Automation Token** — Dev Dashboard → app → Settings
+2. **Deploy service account** — Editor, Secret Manager Admin, Cloud Functions Admin, then a JSON key
+3. **Runtime service account** — Service Account Token Creator on `<project-number>-compute@developer.gserviceaccount.com`
+4. **Shopify** — `application_url` and `redirect_urls` in `shopify.app.toml` point to `https://<project>.web.app`
+5. **App Automation Token** — Dev Dashboard → app → Settings
 
 ## GitHub secrets
 
 | Secret | Value |
 | --- | --- |
-| `GCP_SA_KEY` | the service account JSON key |
+| `GCP_SA_KEY` | the deploy service account JSON key |
 | `SHOPIFY_API_KEY` | the app's client ID |
 | `SHOPIFY_API_SECRET` | the app's client secret |
 | `SHOPIFY_APP_AUTOMATION_TOKEN` | the App Automation Token |
@@ -50,7 +51,7 @@ jobs:
       - run: sed -i "s/__SHOPIFY_API_KEY__/$SHOPIFY_API_KEY/" public/index.html
       - run: |
           for name in SHOPIFY_API_KEY SHOPIFY_API_SECRET; do
-            printenv $name | npx meowapps firebase functions:secrets:set $name --data-file - --project <project>
+            printf %s "${!name}" | npx meowapps firebase functions:secrets:set $name --data-file - --project <project>
           done
       - run: npx meowapps firebase deploy --project <project> --force
       - run: npx meowapps firebase functions:secrets:prune --project <project> --force
@@ -59,17 +60,21 @@ jobs:
 
 ## Gotchas
 
-**Do** name secrets without `FIREBASE_`, `X_GOOGLE_`, `EXT_` or `KIT_`. **Why:** Firebase reserves those prefixes, and the emulator doesn't check.
+**Do** grant Cloud Functions Admin and Secret Manager Admin on top of Editor. **Why:** Editor can't make HTTPS functions public or let them read secrets.
 
-**Do** keep `__SHOPIFY_API_KEY__` in `index.html`. **Don't** commit the real key. **Why:** CI replaces it with the key of the app it deploys.
+**Do** grant Service Account Token Creator to the runtime service account. **Why:** `/api/auth` signs custom tokens through IAM, and Editor lacks `iam.serviceAccounts.signBlob`.
 
 **Do** register a Web app in the project. **Why:** the router reads its config from Hosting's `/__/firebase/init.json`.
 
+**Do** name secrets without `FIREBASE_`, `X_GOOGLE_`, `EXT_` or `KIT_`. **Why:** Firebase reserves those prefixes, and the emulator doesn't check.
+
+**Do** pipe secrets with `printf %s`. **Don't** use `printenv` or `echo`. **Why:** they add a newline, and Firebase stores it as part of the secret.
+
 **Do** prune secrets after deploy. **Don't** pass `--force` to `secrets:set`. **Why:** each set adds a billed version, and `--force` redeploys functions once per secret.
 
-**Do** deploy Shopify with `--allow-updates` and `SHOPIFY_APP_AUTOMATION_TOKEN`. **Don't** use `--force` or `SHOPIFY_CLI_PARTNERS_TOKEN`. **Why:** Shopify CLI 4 dropped both.
+**Do** keep `__SHOPIFY_API_KEY__` in `index.html`. **Don't** commit the real key. **Why:** CI replaces it with the key of the app it deploys.
 
-**Do** grant Cloud Functions Admin and Secret Manager Admin on top of Editor. **Why:** Editor can't make HTTPS functions public or let them read secrets.
+**Do** deploy Shopify with `--allow-updates` and `SHOPIFY_APP_AUTOMATION_TOKEN`. **Don't** use `--force` or `SHOPIFY_CLI_PARTNERS_TOKEN`. **Why:** Shopify CLI 4 dropped both.
 
 **Do** keep absolute paths in `.meowapps/firebase.json`. **Don't** go back to `../`. **Why:** `firebase deploy` rejects sources outside the folder of `firebase.json`.
 
