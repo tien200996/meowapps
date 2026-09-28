@@ -55,6 +55,13 @@ if (!inDir) {
     `${MEOWAPPS_DIR}/.gitignore`,
     `# Ignore the entire ${MEOWAPPS_DIR} directory\n*\n`,
   );
+  writeFileSync(
+    `${MEOWAPPS_DIR}/firebase.json`,
+    readFileSync(`${MEOWAPPS_DIR}/firebase.json`, "utf8").replaceAll(
+      '"../',
+      JSON.stringify(`${process.cwd()}/`).slice(0, -1),
+    ),
+  );
 }
 
 if (tool === "init") {
