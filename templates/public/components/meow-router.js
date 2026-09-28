@@ -30,10 +30,10 @@ class MeowRouter extends HTMLElement {
   }
 
   async #signIn() {
-    const config = await (await fetch("/api/public/config")).json();
+    const config = await (await fetch("/__/firebase/init.json")).json();
 
-    const auth = getAuth(initializeApp(config.firebase));
-    if (config.authEmulator) {
+    const auth = getAuth(initializeApp(config));
+    if (config.projectId.startsWith("demo-")) {
       connectAuthEmulator(auth, location.origin, { disableWarnings: true });
     }
 

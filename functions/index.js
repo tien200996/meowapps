@@ -6,7 +6,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { shopifyApi, ApiVersion } from "@shopify/shopify-api";
 import "@shopify/shopify-api/adapters/node";
 
-const SECRETS = ["SHOPIFY_API_KEY", "SHOPIFY_API_SECRET", "FIREBASE_API_KEY"];
+const SECRETS = ["SHOPIFY_API_KEY", "SHOPIFY_API_SECRET"];
 
 initializeApp();
 
@@ -21,14 +21,6 @@ export const createSchedule = (schedule, run, { secrets = [], timeZone } = {}) =
 
 export const createFunctions = (appRoutes = {}, { secrets = [] } = {}) => {
   const routes = {
-    "/api/public/config": (req, res) =>
-      res.json({
-        firebase: {
-          apiKey: process.env.FUNCTIONS_EMULATOR ? "demo-key" : process.env.FIREBASE_API_KEY,
-          projectId: process.env.GCLOUD_PROJECT,
-        },
-        authEmulator: !!process.env.FUNCTIONS_EMULATOR,
-      }),
     "/api/auth": async (req, res, { shopId, payload }) =>
       res.json({ token: await getAuth().createCustomToken(`${shopId}_${payload.sub}`, { shopId }) }),
     ...appRoutes,
