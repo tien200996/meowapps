@@ -82,7 +82,7 @@ jobs:
           done
       - run: npx meowapps firebase deploy --force
       - run: npx meowapps firebase functions:secrets:prune --force
-      - run: npx meowapps shopify app deploy --allow-updates
+      - run: npx meowapps shopify app deploy --config shopify.app.toml --allow-updates
 ```
 
 ## When a step fails
@@ -95,6 +95,7 @@ jobs:
 | `starts with a reserved prefix` | Rename the secret so it doesn't start with `FIREBASE_`, `X_GOOGLE_`, `EXT_` or `KIT_` |
 | `/api/auth` returns 401 after a green deploy | Pipe secrets with `printf %s`, then push again |
 | `No matching version found for meowapps` | Wait until the version leaves "Validating" on npm |
+| `not approved to subscribe to webhook topics containing protected customer data` | Partner Dashboard → app → API access requests → Protected customer data access, then Step 1 |
 
 ## Don't
 
@@ -107,5 +108,11 @@ jobs:
 **Don't** pass `--force` to `functions:secrets:set`. **Do** run `functions:secrets:prune --force` after deploy. **Why:** each set adds a billed version, and `--force` redeploys functions once per secret.
 
 **Don't** use `shopify app deploy --force` or `SHOPIFY_CLI_PARTNERS_TOKEN`. **Do** use `--allow-updates` with `SHOPIFY_APP_AUTOMATION_TOKEN`. **Why:** Shopify CLI 4 dropped both.
+
+**Don't** add `include_config_on_deploy` to `[build]`. **Do** leave it out. **Why:** Shopify CLI 4 always deploys the config and warns about the field.
+
+**Don't** let CI pick the Shopify config. **Do** pass `--config shopify.app.toml`. **Why:** with a `shopify.app.dev.toml` next to it, the right app gets deployed no matter which config `shopify app config use` picked.
+
+**Don't** point two tomls at the same `application_url`. **Do** give each Shopify app its own Firebase project. **Why:** one backend holds one `SHOPIFY_API_KEY`, so the other app's session tokens get 401.
 
 **Don't** stop after `npm run dev` when dev and prod share one Shopify app. **Do** push to `main` again. **Why:** dev points the app's URLs at the tunnel.
