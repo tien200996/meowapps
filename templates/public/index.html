@@ -17,15 +17,16 @@
       <s-link href="/learn">Learn</s-link>
     </s-app-nav>
 
-    <meow-router>
-      <meow-route path="/" tag="meow-index"></meow-route>
-      <meow-route path="/learn" tag="meow-learn"></meow-route>
-      <meow-route path="/learn/:topic" tag="meow-topic"></meow-route>
-    </meow-router>
+    <meow-app error-heading="Something went wrong">
+      <meow-route route-path="/" page-tag="meow-index"></meow-route>
+      <meow-route route-path="/learn" page-tag="meow-guide"></meow-route>
+      <meow-route route-path="/learn/:topicName" page-tag="meow-topic"></meow-route>
+    </meow-app>
 
-    <script type="module" src="/components/meow-router.js"></script>
-    <script type="module" src="/components/meow-index.js"></script>
-    <script type="module" src="/components/meow-learn.js"></script>
-    <script type="module" src="/components/meow-topic.js"></script>
+    <script type="module" src="/meowapps/meow-app.js"></script>
+    <script type="module" src="/components/meow-note.js"></script>
+    <script type="module" src="/pages/meow-index.js"></script>
+    <script type="module" src="/pages/meow-guide.js"></script>
+    <script type="module" src="/pages/meow-topic.js"></script>
   </body>
 </html>

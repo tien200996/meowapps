@@ -9,11 +9,11 @@
   "hosting": {
     "public": "../public",
     "rewrites": [
-      { "source": "/api/**", "function": "api" },
-      { "source": "/identitytoolkit.googleapis.com/**", "function": "emulator" },
-      { "source": "/securetoken.googleapis.com/**", "function": "emulator" },
-      { "source": "/google.firestore.v1.Firestore/**", "function": "emulator" },
-      { "source": "/emulator/**", "function": "emulator" },
+      { "source": "/api/**", "function": "handleApi" },
+      { "source": "/identitytoolkit.googleapis.com/**", "function": "proxyEmulator" },
+      { "source": "/securetoken.googleapis.com/**", "function": "proxyEmulator" },
+      { "source": "/google.firestore.v1.Firestore/**", "function": "proxyEmulator" },
+      { "source": "/emulator/**", "function": "proxyEmulator" },
       { "source": "**", "destination": "/index.html" }
     ]
   },

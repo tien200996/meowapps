@@ -1,6 +1,6 @@
 {
   "indexes": [],
   "fieldOverrides": [
-    { "collectionGroup": "temp", "fieldPath": "expireAt", "ttl": true, "indexes": [] }
+    { "collectionGroup": "temp", "fieldPath": "expireTime", "ttl": true, "indexes": [] }
   ]
 }

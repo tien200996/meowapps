@@ -1,6 +1,6 @@
 {
   "name": "meowapps",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -8,10 +8,10 @@
     "url": "git+https://github.com/tien200996/meowapps.git"
   },
   "bin": {
-    "meowapps": "bin/meowapps.js"
+    "meowapps": "bin/meow-cli.js"
   },
   "exports": {
-    "./functions": "./functions/index.js"
+    "./functions": "./functions/meow-backend.js"
   },
   "dependencies": {
     "firebase-admin": "^14.4.0",

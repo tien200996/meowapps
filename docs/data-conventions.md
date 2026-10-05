@@ -26,14 +26,14 @@ Rules for storing app data in Firestore. Read before adding a collection or fiel
 
 ## Fields
 
-- `at`: ms since epoch (`Date.now()`). Sort by it.
-- `expireAt`: `Date`. Required on `temp` docs. Check it on read, because TTL deletes up to a day late.
+- `saveTime`: ms since epoch (`Date.now()`). Sort by it.
+- `expireTime`: `Date`. Required on `temp` docs. Check it on read, because TTL deletes up to a day late.
 
 ## Don't
 
 **Don't** store tokens under `shops/{shopId}/…`. **Do** use `private/{shopId}/integrations/{name}`. **Why:** the client can write anything under `shops/{shopId}`.
 
-**Don't** call `db.collectionGroup("logs")`. **Do** queue work in `system/{name}/queue/{id}`. **Why:** collection group queries need indexes the app can't declare.
+**Don't** call `MeowBackend.appDatabase.collectionGroup('logs')`. **Do** queue work in `system/{name}/queue/{id}`. **Why:** collection group queries need indexes the app can't declare.
 
 **Don't** use `shops/myshop/…`. **Do** use `shops/myshop.myshopify.com/…`.
 

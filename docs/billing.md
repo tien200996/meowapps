@@ -12,7 +12,7 @@ Shopify hosts the plan page and charges the merchant. The app checks the plan an
 - Create plans in the Partner Dashboard, not in code.
 - Pick plan names and handles once, because Shopify never lets you change them. `getPlan` returns the name, like `Basic`.
 - Use one event handle for the usage meter of every plan, like `{eventHandle}`, and send exactly that string.
-- Open the app once on each store after install. `/api/auth` stores the token that `getPlan` and `sendAppEvent` need.
+- Open the app once on each store after install. `/api/auth` stores the token that `getPlan` and `reportUsage` need.
 
 ## Create plans
 
@@ -35,10 +35,10 @@ Shopify hosts the plan page and charges the merchant. The app checks the plan an
 ## Check the plan
 
 ```js
-import { getPlan } from "meowapps/functions";
+import { MeowBackend } from 'meowapps/functions'
 
-const plan = await getPlan(shopId);
-if (!plan) return;
+const planName = await MeowBackend.getPlan(shopId)
+if (!planName) return
 ```
 
 - It returns the plan name, or `null` when the store has no plan.
@@ -48,23 +48,22 @@ if (!plan) return;
 
 App Store review requires a way to change plans inside the app.
 
-```html
-<s-button href="https://admin.shopify.com/store/{storeHandle}/charges/{appHandle}/pricing_plans" target="_top">
-  Choose a plan
-</s-button>
+```js
+const { buildHtml, readPlan } = this.meowApp
+const { planName, planUrl } = await readPlan()
+this.innerHTML = buildHtml`<s-button href="${planUrl}" target="_top">${planName ? 'Change plan' : 'Choose a plan'}</s-button>`
 ```
 
-- `{storeHandle}` is `{shopId}` without `.myshopify.com`.
-- Read `{appHandle}` in the frontend with `{ currentAppInstallation { app { handle } } }` on `shopify:admin/api/graphql.json`.
-- Turn on `embedded_app_direct_api_access = true` under `[access.admin]` in `shopify.app.toml`, or that fetch fails.
+- `readPlan` returns the plan name, or `null` when the store has no plan, and the URL of the plan page.
+- Turn on `embedded_app_direct_api_access = true` under `[access.admin]` in `shopify.app.toml`, or `readPlan` throws.
 - Keep `target="_top"`, because the app runs in an iframe.
 
 ## Report usage
 
 ```js
-import { sendAppEvent } from "meowapps/functions";
+import { MeowBackend } from 'meowapps/functions'
 
-await sendAppEvent(shopId, "{eventHandle}", "{actionId}");
+await MeowBackend.reportUsage(shopId, '{eventHandle}', '{actionId}')
 ```
 
 - Call it after the billable action succeeds. Each call adds 1 unit.
@@ -77,7 +76,7 @@ await sendAppEvent(shopId, "{eventHandle}", "{actionId}");
 | Error | Fix |
 | --- | --- |
 | The plan page shows 404 | Give the store a plan it can see: a public plan with a display name, or a private plan for that store |
-| `getPlan` or `sendAppEvent` throws `Cannot read properties of undefined` | Open the app once on that store |
+| `getPlan` or `reportUsage` throws `No Shopify token for {shopId}` | Open the app once on that store |
 | `401 https://{shopId}/admin/oauth/access_token` | The merchant uninstalled, or nothing used the token for 90 days. The merchant opens the app to fix it |
 | Billing result code `NO_SUBSCRIPTION` | The store has no plan with this meter |
 | The event is missing under **App billing event** | The event handle doesn't match the meter. Handles are case-sensitive |
@@ -92,4 +91,4 @@ await sendAppEvent(shopId, "{eventHandle}", "{actionId}");
 
 **Don't** let the request body decide whether an action is billed. **Do** decide on the server. For example, the server marks every test send as unbilled. **Why:** a merchant can call `/api/*` with any body.
 
-**Don't** gate features on the plan the frontend reads. **Do** call `getPlan` on the server. **Why:** the merchant controls the browser.
+**Don't** gate features on the plan that `readPlan` returns. **Do** call `getPlan` on the server. **Why:** the merchant controls the browser.

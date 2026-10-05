@@ -1,5 +1,6 @@
-import { createFunctions } from "meowapps/functions";
+import { MeowBackend } from 'meowapps/functions'
+import { AppRoutes } from './app-routes.js'
 
-export const { api, emulator } = createFunctions({
-  "/api/hello": (req, res, { shopId }) => res.json({ shopId }),
-});
+export const { handleApi, proxyEmulator } = MeowBackend.createFunctions({
+  '/api/hello': AppRoutes.sayHello,
+})

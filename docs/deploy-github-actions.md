@@ -91,7 +91,7 @@ jobs:
 | --- | --- |
 | `No currently active project` | Commit `.firebaserc` at the app root |
 | `Permission denied to get service`, `secretmanager.secrets.get denied`, `cloudfunctions.functions.setIamPolicy is required` | Grant the deploy service account Editor, Secret Manager Admin and Cloud Functions Admin |
-| `iam.serviceAccounts.signBlob denied` in the `api` function logs | Grant Service Account Token Creator to `{projectNumber}-compute@developer.gserviceaccount.com` |
+| `iam.serviceAccounts.signBlob denied` in the `handleApi` function logs | Grant Service Account Token Creator to `{projectNumber}-compute@developer.gserviceaccount.com` |
 | `starts with a reserved prefix` | Rename the secret so it doesn't start with `FIREBASE_`, `X_GOOGLE_`, `EXT_` or `KIT_` |
 | `/api/auth` returns 401 after a green deploy | Pipe secrets with `printf %s`, then push again |
 | `No matching version found for meowapps` | Wait until the version leaves "Validating" on npm |

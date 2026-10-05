@@ -1,6 +1,11 @@
-class MeowLearn extends HTMLElement {
-  connectedCallback() {
-    this.innerHTML = `
+class MeowGuide extends HTMLElement {
+  static {
+    customElements.define('meow-guide', MeowGuide)
+  }
+
+  renderPage() {
+    const { buildHtml } = this.meowApp
+    this.innerHTML = buildHtml`
       <s-page heading="Learn">
         <s-section heading="How this template works">
           <s-stack gap="base">
@@ -26,8 +31,6 @@ class MeowLearn extends HTMLElement {
           </s-stack>
         </s-section>
       </s-page>
-    `;
+    `
   }
 }
-
-customElements.define("meow-learn", MeowLearn);
