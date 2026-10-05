@@ -69,13 +69,14 @@ class MeowTopic extends HTMLElement {
 
 ## Web pages
 
-Pages own the data, components only show it, and services hold the logic that pages share.
+Pages own the data and draw the screen, components only show what they get, and services hold the logic that doesn't draw.
 
 - `public/meowapps/meow-app.js` defines `<meow-app>`, which signs in, routes and runs each page. Every app keeps the same copy.
 - `<meow-app>` sets `this.meowApp`, `this.shopId` and `this.routeParams`, calls `loadData()` if the page has it, then calls `renderPage(pageData)`.
 - A page draws itself in `renderPage`, not in `connectedCallback`.
 - A page sits in `public/pages/` and imports only services from `public/services/`.
 - A component sits in `public/components/` and imports nothing. It reads its attributes and builds its DOM with `textContent`.
+- A service sits in `public/services/` and imports only services. It holds the rules of an outside API and what pages share, like `ZaloTemplate`, which builds what Zalo receives.
 - `innerHTML` gets HTML only from `this.meowApp.buildHtml`, which escapes every value.
 - An action that calls an API runs through `this.meowApp.bindAction`, which shows loading and an error toast.
 - The text of `<meow-app>` comes from its attributes in `index.html`, like `error-heading`.
