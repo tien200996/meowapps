@@ -7,6 +7,8 @@ class MeowGuide extends HTMLElement {
     const { buildHtml } = this.meowApp
     this.innerHTML = buildHtml`
       <s-page heading="Learn">
+        <s-link slot="breadcrumb-actions" href="/">Home</s-link>
+
         <s-section heading="How this template works">
           <s-stack gap="base">
             <s-link href="/learn/pages">Pages — write one and route it</s-link>

@@ -74,6 +74,7 @@ Pages own the data and draw the screen, components only show what they get, and 
 - `public/meowapps/meow-app.js` defines `<meow-app>`, which signs in, routes and runs each page. Every app keeps the same copy.
 - `<meow-app>` sets `this.meowApp`, `this.shopId` and `this.routeParams`, calls `loadData()` if the page has it, then calls `renderPage(pageData)`.
 - A page draws itself in `renderPage`, not in `connectedCallback`.
+- A page's path is its level: `/` is Home, `/learn` is level 2, `/learn/pages` is level 3. `<s-app-nav>` lists level 2 pages only, and every page under Home has one `breadcrumb-actions` link to its parent.
 - A page sits in `public/pages/` and imports only services from `public/services/`.
 - A component sits in `public/components/` and imports nothing. It reads its attributes and builds its DOM with `textContent`.
 - A service sits in `public/services/` and imports only services. It holds the rules of an outside API and what pages share, like `ZaloTemplate`, which builds what Zalo receives.
