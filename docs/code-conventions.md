@@ -10,7 +10,7 @@ Rules for the code of meowapps and of every app built on it, one rule for each c
 ## TL;DR
 
 - A Firestore field keeps its name after the first store installs the app, because renaming a stored field forces a data migration.
-- The functions export as `handleApi` and `proxyEmulator`, because `firebase.json` routes to these names.
+- The functions export as `handleApi`, `proxyEmulator` and `handleIdentity`, because `firebase.json` routes to these names.
 - An exported function keeps its name, because `firebase deploy --force` deletes the function under the old name.
 
 ## Names

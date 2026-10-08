@@ -9,6 +9,7 @@
   "hosting": {
     "public": "../public",
     "rewrites": [
+      { "regex": "^/api/public/identity/", "function": "handleIdentity" },
       { "source": "/api/**", "function": "handleApi" },
       { "source": "/identitytoolkit.googleapis.com/**", "function": "proxyEmulator" },
       { "source": "/securetoken.googleapis.com/**", "function": "proxyEmulator" },
