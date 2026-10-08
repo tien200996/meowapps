@@ -21,21 +21,23 @@ class MeowCli {
   static #ignoreText = '# Ignore the entire .meowapps directory\n*\n'
   static #parentPrefix = '"../'
   static #descriptionPattern = /^description: (.*)$/m
-  static #usageText = `meowapps <command|tool> [args...]
+  static #usageText = `Usage: npx meowapps <command|tool> [args...]
 
 Commands:
-  init        Set up this project
+  init
+    Link a Shopify app and copy the template into this folder
 
 Tools:
-  shopify     Shopify CLI
-  firebase    Firebase CLI
-
-Examples:
-  meowapps init
-  meowapps shopify app dev
-  meowapps shopify app deploy
-  meowapps firebase deploy
-  meowapps shopify --help
+  shopify app dev
+    Run the app on a dev store with the Firebase emulators
+  shopify app deploy
+    Release the app config and extensions to Shopify
+  firebase deploy
+    Deploy functions, hosting and Firestore rules to Firebase
+  shopify app [args...]
+    Run any other Shopify app command, see shopify app --help
+  firebase [args...]
+    Run any other Firebase CLI command, see firebase --help
 
 Docs:
 `

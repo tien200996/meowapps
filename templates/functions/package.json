@@ -6,6 +6,6 @@
     "node": "22"
   },
   "dependencies": {
-    "meowapps": "^0.3.0"
+    "meowapps": "^0.3.1"
   }
 }
