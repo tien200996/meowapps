@@ -117,7 +117,7 @@ meowapps owns these Firestore paths.
 
 | Command | What it does |
 | --- | --- |
-| `npx meowapps init` | links a Shopify app and copies the starter app into the folder |
+| `npx meowapps init` | links a Shopify app, and copies the starter app into a new folder |
 | `npx meowapps shopify …` | runs the Shopify CLI at the version that meowapps pins |
 | `npx meowapps firebase …` | runs the Firebase CLI at the version that meowapps pins, from `.meowapps/` |
 

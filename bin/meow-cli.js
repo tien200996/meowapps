@@ -17,7 +17,7 @@ class MeowCli {
 
 Commands:
   init
-    Link a Shopify app and copy the template into this folder
+    Link a Shopify app, and copy the template into a new folder
 
 Tools:
   shopify app dev
@@ -48,6 +48,8 @@ Docs:
   static #appPath = join(MeowCli.#appFolder, 'meow-app.js')
   static #appSource = join(MeowCli.#templateFolder, MeowCli.#appPath)
   static #appIgnore = '# meowapps writes this folder on every run\n*\n'
+  static #markerFile = join('functions', 'package.json')
+  static #dependencyName = 'meowapps'
   static #linkArgs = ['app', 'config', 'link']
   static #emulatorPrefix = 'emulators:'
   static #configFile = 'firebase.json'
@@ -107,6 +109,7 @@ Docs:
   }
 
   static async #initApp() {
+    if (await MeowCli.#findApp()) return MeowCli.#runTool('shopify', MeowCli.#linkArgs)
     const existingFiles = await MeowCli.#filterExisting(await MeowCli.#listTemplates())
     if (existingFiles.length) throw new Error(`init would overwrite ${existingFiles.join(', ')}; move them away and run init again`)
     const exitCode = await MeowCli.#runTool('shopify', MeowCli.#linkArgs)
@@ -148,6 +151,12 @@ Docs:
     const workProject = join(MeowCli.#workFolder, MeowCli.#projectFile)
     if (await MeowCli.#findFile(MeowCli.#projectFile)) await MeowCli.#replaceFile(workProject, await readFile(MeowCli.#projectFile))
     else await rm(workProject, { force: true })
+  }
+
+  static async #findApp() {
+    if (!await MeowCli.#findFile(MeowCli.#markerFile)) return false
+    const { dependencies } = JSON.parse(await readFile(MeowCli.#markerFile, 'utf8'))
+    return Object.hasOwn(dependencies ?? {}, MeowCli.#dependencyName)
   }
 
   static async #filterExisting(templateFiles) {
