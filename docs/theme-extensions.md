@@ -14,7 +14,8 @@ The examples come from a loyalty app that signs members in with their phone numb
 ## TL;DR
 
 - Put every file directly in `assets`, `blocks`, `locales` or `snippets`.
-  A deploy leaves out files in subfolders and at the root, like a `README.md`, without an error.- Use an Online Store 2.0 theme.
+  A deploy leaves out files in subfolders and at the root, like a `README.md`, without an error.
+- Use an Online Store 2.0 theme.
   Vintage themes like Debut show no **Add section** on pages, so they can't take app blocks.
 
 ## Step 1: create the extension
