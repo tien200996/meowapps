@@ -17,26 +17,11 @@ docs/         the guides shown in npx meowapps
 templates/    the starter app that init copies
 ```
 
-## Writing docs
-
-```md
----
-name: {fileName}
-description: {Verb} {task}
----
-```
-
-- Start with frontmatter, because `npx meowapps` prints `description` under the file path.
-- Open with a `## TL;DR` of the rules that break a deploy or force a data migration.
-- Follow each rule with a real example.
-- Write values the reader fills in as `{camelCase}`, like `{shopId}`.
-- End with a `## Don't` section written as **Don't** / **Do** / **Why**.
-- Describe only what exists now.
-
 ## Gotchas
 
 - Files in `templates/` go into every new app, so keep only starter code there.
 - To release, bump `version` in `package.json` and `meowapps` in `templates/functions/package.json` together.
+- A push to `main` with a new version publishes to npm.
 
 ## Suggest a change
 

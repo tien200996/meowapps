@@ -272,7 +272,7 @@ export class MeowBackend {
   static async #loadAccess(shopId) {
     const tokenSnapshot = await MeowBackend.#readToken(shopId)
     const storedToken = tokenSnapshot.data()
-    if (storedToken.expireTime > Date.now() + MeowBackend.#refreshMargin) return storedToken.accessToken
+    if (storedToken.expireTime.toMillis() > Date.now() + MeowBackend.#refreshMargin) return storedToken.accessToken
     const freshToken = await MeowBackend.#grantToken(shopId, { grant_type: 'refresh_token', refresh_token: storedToken.refreshToken })
     await MeowBackend.#locateToken(shopId)
       .update(freshToken, { lastUpdateTime: tokenSnapshot.updateTime })
@@ -532,7 +532,7 @@ export class MeowBackend {
     return {
       accessToken: tokenAnswer.access_token,
       refreshToken: tokenAnswer.refresh_token,
-      expireTime: Date.now() + tokenAnswer.expires_in * MeowBackend.#secondMillis,
+      expireTime: new Date(Date.now() + tokenAnswer.expires_in * MeowBackend.#secondMillis),
     }
   }
 
