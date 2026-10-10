@@ -101,6 +101,7 @@ async #callRoute(routePath, requestBody) {
 | --- | --- |
 | The theme editor shows no **Add section** on a page | Use an Online Store 2.0 theme, because vintage themes like Debut can't take app blocks |
 | A file is missing on the store after a deploy | Move it directly into `assets`, `blocks`, `locales` or `snippets` |
+| The block's calls to `/apps/{subpath}/…` answer 404, and the app logs show no request | In **Settings** → **Apps** → `{appName}`, click **Customize URL** and change **App Proxy URL** from `/apps/{subpath}-1` back to `/apps/{subpath}` |
 
 ## Don't
 
